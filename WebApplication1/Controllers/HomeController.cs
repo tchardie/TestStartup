@@ -28,6 +28,8 @@ namespace WebApplication1.Controllers
 
         public ActionResult Contact()
         {
+            HttpContext.Session["userName"] = "MyUserName";
+
             ViewBag.Message = "Your contact page.";
 
             return View();

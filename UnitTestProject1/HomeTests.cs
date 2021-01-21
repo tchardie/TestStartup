@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web;
 using System.Web.Mvc;
 using WebApplication1.Controllers;
 using WebApplication1.Models;
@@ -72,6 +73,14 @@ namespace UnitTestProject1
 
             var name = ((ModelA) data).Name;
             Assert.AreEqual("TestName", name);
+        }
+
+        [TestMethod]
+        public void TestHttpSessionFake()
+        {
+            var result = controller.Contact();
+
+            Assert.IsNotNull(result);
         }
     }
 }
