@@ -6,20 +6,26 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
+using System.Web.Routing;
+using UnitTestProject1.Utils;
 using WebApplication1.Controllers;
 using WebApplication1.Models;
 
 namespace UnitTestProject1
 {
-    [TestClass]
     public class HomeTests
     {
         HomeController controller;
+        HttpContextBase httpContext;
 
         [TestInitialize]
         public void Setup()
         {
             controller = new HomeController();
+            httpContext = new HttpContextMock();
+
+            // For mocking the session state
+            controller.ControllerContext = new ControllerContext(httpContext, new RouteData(), controller);
         }
 
         [TestCleanup]
@@ -29,58 +35,126 @@ namespace UnitTestProject1
             controller = null;
         }
 
-        [TestMethod]
-        public void TestIndexGet()
-        {
-            var result = controller.Index();
 
-            Assert.IsNotNull(result);
-            Assert.IsInstanceOfType(result, typeof(ViewResult));
+        [TestClass]
+        public class Index : HomeTests
+        {
+            [TestMethod]
+            public void ReturnViewResult()
+            {
+                var result = controller.Index();
+
+                Assert.IsNotNull(result);
+                Assert.IsInstanceOfType(result, typeof(ViewResult));
+            }
+
+            [TestMethod]
+            [DataRow(null)]
+            [DataRow(1)]
+            public void ReturnActionResult_WithVariousIds(int? id)
+            {
+                var result = controller.About(id);
+
+                Assert.IsNotNull(result);
+                Assert.IsInstanceOfType(result, typeof(ActionResult));
+            }
         }
 
-        [TestMethod]
-        [DataRow(null)]
-        [DataRow(1)]
-        public void TestAboutWithDifferentInputs(int? id)
+        [TestClass]
+        public class About : HomeTests
         {
-            var result = controller.About(id);
+            [TestMethod]
+            public void ReturnsViewResult_WithNullId()
+            {
+                int? id = null;
+                var result = controller.About(id);
 
-            Assert.IsNotNull(result);
-            Assert.IsInstanceOfType(result, typeof(ActionResult));
+                Assert.IsNotNull(result);
+                Assert.IsInstanceOfType(result, typeof(ViewResult));
+            }
+
+            [TestMethod]
+            public void ReturnNameInJsonResult_WithValidId()
+            {
+                var result = controller.About(1);
+
+                Assert.IsNotNull(result);
+                Assert.IsInstanceOfType(result, typeof(JsonResult));
+
+                var data = ((JsonResult)result).Data;
+
+                Assert.IsInstanceOfType(data, typeof(ModelA));
+
+                var name = ((ModelA)data).Name;
+                Assert.AreEqual("TestName", name);
+            }
         }
 
-        [TestMethod]
-        public void TestAboutWithNullId()
+        [TestClass]
+        public class Contact : HomeTests
         {
-            int? id = null;
-            var result = controller.About(id);
+            [TestMethod]
+            public void SetsCorrectSessionValue()
+            {
+                var result = controller.Contact();
 
-            Assert.IsNotNull(result);
-            Assert.IsInstanceOfType(result, typeof(ViewResult));
+                Assert.IsNotNull(result);
+                Assert.IsInstanceOfType(result, typeof(ActionResult));
+
+                var userName = httpContext.Session["userName"];
+                Assert.AreEqual("MyUserName", userName);
+            }
         }
 
-        [TestMethod]
-        public void TestAboutWithIdAndGetName()
+        [TestClass]
+        public class GetListOfUsers: HomeTests
         {
-            var result = controller.About(1);
+            [TestMethod]
+            public void ReturnsEmptyList_WithNullId()
+            {
+                var list = controller.GetListOfUsers(null);
 
-            Assert.IsNotNull(result);
-            Assert.IsInstanceOfType(result, typeof(JsonResult));
+                Assert.IsNotNull(list);
+                Assert.AreEqual(0, list.Count);
+            }
 
-            var data = ((JsonResult)result).Data;
+            [TestMethod]
+            [DataRow(1)]
+            [DataRow(3)]
+            [DataRow(5)]
+            public void ReturnsPopulatedList_WithAnyId(int id)
+            {
+                var list = controller.GetListOfUsers(id);
 
-            Assert.IsInstanceOfType(data, typeof(ModelA));
+                Assert.IsNotNull(list);
+                Assert.IsTrue(list.Count > 0);
+            }
 
-            var name = ((ModelA) data).Name;
-            Assert.AreEqual("TestName", name);
+            [TestMethod]
+            public void ReturnsSmallerPopulatedList_WithSpecificId()
+            {
+                var list = controller.GetListOfUsers(3);
+
+                Assert.IsNotNull(list);
+                Assert.AreEqual(3, list.Count);
+            }
         }
 
-        [TestMethod]
-        public void TestHttpSessionFake()
+        [TestClass]
+        public class GetListAsync : HomeTests
         {
-            var result = controller.Contact();
+            [TestMethod]
+            public void ReturnsAsyncList()
+            {
+                var taskResult = controller.GetListAsync();
 
-            Assert.IsNotNull(result);
+                Assert.IsNotNull(taskResult);
+
+                var result = taskResult.GetAwaiter().GetResult();
+
+                Assert.IsNotNull(result);
+                Assert.IsTrue(result.Count > 0);
+            }
         }
     }
 }
