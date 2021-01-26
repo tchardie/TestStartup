@@ -1,0 +1,5 @@
+﻿Gecko WebDriver (firefox)
+https://github.com/mozilla/geckodriver/releases
+
+<package id="Selenium.Support" version="3.141.0" targetFramework="net452" />
+<package id="Selenium.WebDriver" version="3.141.0" targetFramework="net452" />
