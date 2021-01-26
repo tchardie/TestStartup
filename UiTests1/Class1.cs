@@ -1,10 +1,5 @@
 ﻿using OpenQA.Selenium;
-using OpenQA.Selenium.Firefox;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Threading;
 using Xunit;
 
 namespace UiTests1
@@ -12,25 +7,40 @@ namespace UiTests1
     /**
      * Builds new context for every test. See FixtureDemo for reusing the same context
      **/
-    public class Class1 : IDisposable
+    public class Class1 : BaseUiTest
     {
-        private readonly IWebDriver _driver;
-        public Class1()
+        public Class1() : base()
         {
-            var driverService = FirefoxDriverService.CreateDefaultService(@"C:\Tools\geckodriver", "geckodriver.exe");
-
-            _driver = new FirefoxDriver(driverService);
-        }
-
-        public void Dispose()
-        {
-            _driver.Close();
+            //var driverService = FirefoxDriverService.CreateDefaultService(@"C:\Tools\geckodriver", "geckodriver.exe");
+            //_driver = new FirefoxDriver(driverService);
         }
 
         [Fact]
         public void Test1()
         {
-            _driver.Url = "https://google.com";
+            Driver.Url = "https://google.com";
+
+            Driver.FindElement(By.Name("q")).SendKeys("microsoft");
+
+            Thread.Sleep(500);
+
+            Driver.FindElement(By.Name("btnK")).Click();
+
+            Thread.Sleep(2000);
+        }
+
+        [Fact]
+        public void Test2()
+        {
+            Driver.Url = "https://google.com";
+
+            Driver.FindElement(By.Name("q")).SendKeys("microsoft");
+
+            Thread.Sleep(500);
+
+            Driver.FindElement(By.Name("btnK")).Click();
+
+            Thread.Sleep(2000);
         }
     }
 }

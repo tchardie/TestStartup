@@ -2,22 +2,24 @@
 using OpenQA.Selenium.Firefox;
 using System;
 
-namespace UiTests1.FixtureDemo
+namespace UiTests1
 {
-    public class BaseFixture : IDisposable
+    public abstract class BaseUiTest : IDisposable
     {
         public IWebDriver Driver { get; private set; }
-        public BaseFixture()
+
+        public BaseUiTest()
         {
             var driverService = FirefoxDriverService.CreateDefaultService(@"C:\Tools\geckodriver", "geckodriver.exe");
 
             Driver = new FirefoxDriver(driverService);
+
+            // TODO Handle Login etc.
         }
 
         public void Dispose()
         {
             Driver.Close();
-            Driver.Dispose();
         }
     }
 }

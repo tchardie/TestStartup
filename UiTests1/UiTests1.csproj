@@ -64,6 +64,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BaseUiTest.cs" />
     <Compile Include="Class1.cs" />
     <Compile Include="FixtureDemo\BaseFixture.cs" />
     <Compile Include="FixtureDemo\FixtureTests1.cs" />
