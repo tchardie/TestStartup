@@ -29,8 +29,6 @@ namespace WebApplication1.Controllers
 
         public ActionResult Contact()
         {
-            HttpContext.Session["userName"] = "MyUserName";
-
             var username = HttpContext.Session["userName"];
 
             ViewBag.Message = "Your contact page.";
