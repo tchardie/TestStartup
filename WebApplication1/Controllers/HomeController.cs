@@ -4,12 +4,24 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
+using WebApplication1.BusinessLayer;
 using WebApplication1.Models;
 
 namespace WebApplication1.Controllers
 {
     public class HomeController : Controller
     {
+        private readonly IMyDataLayer _layer;
+        public HomeController()
+        {
+            _layer = new MyDataLayer();
+        }
+
+        public HomeController(IMyDataLayer layer)
+        {
+            _layer = layer;
+        }
+
         public ActionResult Index()
         {
             return View();
@@ -60,6 +72,26 @@ namespace WebApplication1.Controllers
         public async Task<List<string>> GetListAsync()
         {
             return await BuildList();
+        }
+
+        public ActionResult GetListFromLayer()
+        {
+            // Old way
+            //var items = MyDataLayer.GetListItemsStatic();
+
+            // New Way
+            var items = _layer.GetListItems();
+            return View(items);
+        }
+
+        public ActionResult GetSpecificItemFromLayer(int id)
+        {
+            // Old Way
+            //var item = MyDataLayer.GetSpecificItemStatic(id);
+
+            // new Way
+            var item = _layer.GetSpecificItem(id);
+            return View(item);
         }
 
         private async Task<List<string>> BuildList()

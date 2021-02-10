@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Routing;
+using UnitTestProject1.Fakes;
 using UnitTestProject1.Utils;
 using WebApplication1.Controllers;
 using WebApplication1.Models;
@@ -21,7 +22,7 @@ namespace UnitTestProject1
         [TestInitialize]
         public void Setup()
         {
-            controller = new HomeController();
+            controller = new HomeController(new FakeMyDataLayer());
             httpContext = new HttpContextMock();
 
             // For mocking the session state
@@ -107,7 +108,7 @@ namespace UnitTestProject1
         }
 
         [TestClass]
-        public class GetListOfUsers: HomeTests
+        public class GetListOfUsers : HomeTests
         {
             [TestMethod]
             public void ReturnsEmptyList_WithNullId()
@@ -156,5 +157,35 @@ namespace UnitTestProject1
                 Assert.IsTrue(result.Count > 0);
             }
         }
+
+        [TestClass]
+        public class GetListFromLayer : HomeTests
+        {
+            [TestMethod]
+            public void ReturnsView_WithListModel()
+            {
+                var result = (ViewResult)controller.GetListFromLayer();
+                var model = (List<string>)result.Model;
+
+                Assert.IsNotNull(model);
+                Assert.AreEqual(3, model.Count);
+                Assert.AreEqual("Fake 1", model[0]);
+            }
+        }
+
+        [TestClass]
+        public class GetSpecificItemFromLayer : HomeTests
+        {
+            [TestMethod]
+            public void ReturnsSpecificItemView()
+            {
+                var result = (ViewResult)controller.GetSpecificItemFromLayer(1);
+                var model = (string)result.Model;
+
+                Assert.IsNotNull(model);
+                Assert.AreEqual("FakeItem1", model[0]);
+            }
+        }
+
     }
 }
