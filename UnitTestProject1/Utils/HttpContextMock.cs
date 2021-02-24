@@ -10,6 +10,7 @@ namespace UnitTestProject1.Utils
     public class HttpContextMock : HttpContextBase
     {
         private HttpSessionStateBase sessionState;
+        private HttpRequestBase requestBase;
 
         public override HttpSessionStateBase Session
         {
@@ -21,6 +22,19 @@ namespace UnitTestProject1.Utils
                 }
 
                 return sessionState;
+            }
+        }
+
+        public override HttpRequestBase Request
+        {
+            get
+            {
+                if (requestBase == null)
+                {
+                    requestBase = new HttpRequestMock();
+                }
+
+                return requestBase;
             }
         }
     }
@@ -55,5 +69,10 @@ namespace UnitTestProject1.Utils
                 session[name] = value;
             }
         }
+    }
+
+    public class HttpRequestMock : HttpRequestBase
+    {
+        public override string UserHostAddress => "UserBaseAddress";
     }
 }
